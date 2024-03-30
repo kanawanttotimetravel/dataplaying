@@ -61,11 +61,12 @@ def accuracy_check(classifier):
     acc = accuracy_score(model.predict(X_test), y_test)
     print(f'Accuracy of {classifier} = {acc * 100}')
 
+    # Get FP/TP rate
     scores = model.decision_function(X_test)
-
     fpr, tpr, thresholds = roc_curve(y_test, scores, pos_label=1)
     roc_auc = auc(fpr, tpr)
 
+    # Plot ROC curve
     display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc)
     display.plot()
     plt.show()
