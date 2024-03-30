@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, roc_curve, RocCurveDisplay, auc
+from sklearn.metrics import accuracy_score, roc_curve, RocCurveDisplay, auc, PrecisionRecallDisplay
 
 # Download 10000 samples from cc100
 if not os.path.isfile('data/cc100-samples.csv'):
@@ -62,18 +62,22 @@ def accuracy_check(classifier):
     print(f'Accuracy of {classifier} = {acc * 100}')
 
     # Get FP/TP rate
-    scores = model.decision_function(X_test)
-    fpr, tpr, thresholds = roc_curve(y_test, scores, pos_label=1)
+    scores = model.predict_proba(X_test)[:,1]
+    # print(scores)
+    fpr, tpr, thresholds = roc_curve(y_test, scores)
     roc_auc = auc(fpr, tpr)
 
     # Plot ROC curve
-    display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc)
-    display.plot()
+    roc = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name=classifier, )
+    roc.plot()
+
+    # Plot precision-recall curve
+    precision_recall = PrecisionRecallDisplay.from_predictions(y_test, scores, name=classifier)
+    # precision_recall.plot()
     plt.show()
 
 
-accuracy_check(classifier=svm.SVC())
-
+# accuracy_check(classifier=svm.SVC(probability=True))
 accuracy_check(classifier=RandomForestClassifier())
 
 # X = vectorizer.fit_transform(df['text'])
